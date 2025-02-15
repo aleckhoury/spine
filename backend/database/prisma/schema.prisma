@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  username  String     @unique
+  email     String     @unique
+  password  String
+  name      String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  lists     List[]
+  userBooks UserBook[]
+}
+
+model Book {
+  id            String     @id @default(uuid())
+  title         String
+  isbn          String?    @unique
+  datePublished DateTime?  @map("date_published")
+  pages         Int?
+  overview      String?
+  image         String?
+  synopsis      String?
+  authors       String[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  userBooks     UserBook[]
+
+  @@index([title])
+  @@index([datePublished])
+}
+
+model UserBook {
+  id             String        @id @default(uuid())
+  userId         String
+  bookId         String
+  owned          Boolean       @default(true)
+  readingStatus  ReadingStatus @default(NOT_STARTED)
+  review         String?
+  personalRating Float?
+  progress       Float?
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  listItems      ListItem[]
+  book           Book          @relation(fields: [bookId], references: [id])
+  user           User          @relation(fields: [userId], references: [id])
+
+  @@unique([userId, bookId])
+  @@index([readingStatus])
+}
+
+model List {
+  id        String     @id @default(uuid())
+  name      String
+  userId    String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id])
+  listItems ListItem[]
+}
+
+model ListItem {
+  id         String   @id @default(uuid())
+  listId     String
+  userBookId String
+  position   Decimal  @default(1000000)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  list       List     @relation(fields: [listId], references: [id])
+  userBook   UserBook @relation(fields: [userBookId], references: [id])
+
+  @@unique([listId, userBookId])
+}
+
+enum ReadingStatus {
+  NOT_STARTED
+  READING
+  COMPLETED
+  ABANDONED
+}
