@@ -87,6 +87,7 @@ export const update = api(
 		data: UserUpdateDto;
 	}): Promise<UserResponse> => {
 		try {
+			console.log("TEST", data);
 			const result = await UserService.update(id, data);
 			return result;
 		} catch (error) {

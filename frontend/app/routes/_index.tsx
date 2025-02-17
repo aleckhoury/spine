@@ -1,8 +1,18 @@
 import { useEffect, useRef, useState } from "react";
+import { BookSearch } from "~/components/custom/BookSearch";
+import { LoginDialog } from "~/components/custom/LoginDialog";
+import { SignupDialog } from "~/components/custom/SignupDialog";
+import { ThemeToggle } from "~/components/custom/ThemeToggle";
+import { Button } from "~/components/ui/button";
 import { Grid, GridItem } from "~/components/ui/SortableGrid";
-import ThemeController from "~/components/ui/ThemeController";
+import { useAuth } from "~/hooks/useAuth";
 
-export function Welcome() {
+export async function loader() {
+	return { test: "test" };
+}
+
+export default function Welcome() {
+	const { isAuthenticated, logout } = useAuth();
 	const [items, setItems] = useState<{ id: string; content: string }[]>([
 		{ id: "1", content: "Create list" },
 		{ id: "2", content: "View lists" },
@@ -31,51 +41,30 @@ export function Welcome() {
 
 	return (
 		<>
-			<div className="flex justify-between navbar px-6">
+			<div className="flex justify-between navbar p-6">
 				<div className="navbar-start">
 					<h1 className="text-3xl font-bold">Spine</h1>
 				</div>
-				<div className="flex gap-2">
-					<ThemeController />
+				<div className="flex gap-2 items-center">
+					{/* <ThemeController /> */}
 					{/* Open the modal by updating state */}
-					<button
-						className="btn btn-primary"
-						onClick={() => setIsModalOpen(true)}
-					>
-						Login
-					</button>
-					{/* Use the ref and add an onCancel handler for ESC key support */}
-					<dialog
-						ref={modalRef}
-						className="modal"
-						onCancel={() => setIsModalOpen(false)}
-						onClick={(e) => {
-							// Close only if clicking the backdrop (modal wrapper), not the content
-							if (e.target === modalRef.current) {
-								setIsModalOpen(false);
-							}
-						}}
-					>
-						<div className="modal-box">
-							<h3 className="font-bold text-lg">Hello!</h3>
-							<p className="py-4">
-								Press ESC key or click the button below to close
-							</p>
-							<div className="modal-action">
-								<form method="dialog">
-									{/* Close the modal by updating state */}
-									<button className="btn" onClick={() => setIsModalOpen(false)}>
-										Close
-									</button>
-								</form>
-							</div>
-						</div>
-					</dialog>
+					{isAuthenticated ? (
+						<>
+							<ThemeToggle />
+							<Button onClick={logout}>Logout</Button>
+						</>
+					) : (
+						<>
+							<LoginDialog />
+							<SignupDialog />
+						</>
+					)}
 				</div>
 			</div>
 			<main className="flex items-center justify-center pt-16 pb-4 border-x-4 border-neutral">
 				<div className="flex-1 flex flex-col items-center gap-16 min-h-0">
 					<header className="flex flex-col items-center gap-9">
+						<BookSearch />
 						<div className="w-[500px] max-w-[100vw] p-4 flex items-center justify-between">
 							<Grid items={items} onSortEnd={setItems} sortable>
 								{items.map((item) => (

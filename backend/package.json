@@ -6,7 +6,8 @@
 	"license": "MPL-2.0",
 	"type": "module",
 	"scripts": {
-		"postinstall": "npx prisma generate --schema=database/prisma/schema.prisma"
+		"postinstall": "npx prisma generate --schema=database/prisma/schema.prisma",
+		"gen-client": "encore gen client spine-3oii --env=local --lang=typescript --output=../frontend/app/client.ts"
 	},
 	"devDependencies": {
 		"@types/bcrypt": "^5.0.2",
@@ -14,9 +15,11 @@
 		"typescript": "^5.2.2"
 	},
 	"dependencies": {
-		"prisma": "^6.3.1",
 		"@prisma/client": "^6.3.1",
+		"@types/jsonwebtoken": "^9.0.8",
 		"bcrypt": "^5.1.1",
-		"encore.dev": "^1.46.4"
+		"encore.dev": "^1.46.4",
+		"jsonwebtoken": "^9.0.2",
+		"prisma": "^6.3.1"
 	}
 }
