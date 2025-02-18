@@ -1,0 +1,16 @@
+{
+	"name": "spine",
+	"private": true,
+	"workspaces": [
+		"frontend",
+		"backend"
+	],
+	"scripts": {
+		"dev": "npm run dev:backend & npm run dev:frontend",
+		"dev:frontend": "npm run dev --workspace=frontend",
+		"dev:backend": "cd backend && encore run",
+		"build": "npm run build --workspaces",
+		"test": "npm run test --workspaces",
+		"gen-client": "cd backend && encore gen client spine-3oii --lang=typescript --output=../frontend/app/client.ts"
+	}
+}
