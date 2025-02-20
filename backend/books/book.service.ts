@@ -1,4 +1,5 @@
 import prisma from "../database/prismaClient";
+import SearchService from "../search/search.service";
 import { getOffset, paginatedData } from "../utils";
 import {
 	BookCreateDto,
@@ -24,6 +25,27 @@ const BookService = {
 			result: book,
 		};
 	},
+
+	findOneByISBN: async (isbn: string): Promise<any> => {
+		const internalBook = await prisma.book.findFirst({ where: { isbn } });
+
+		if (!internalBook) {
+			const externalBook = await SearchService.getGoogleBook(isbn);
+			const book = await prisma.book.create({
+				data: {
+					isbn: externalBook.id,
+					title: externalBook.volumeInfo.title,
+				},
+			});
+			return book;
+		}
+		if (!book) {
+			return {
+				success: false,
+				message: "Book not found",
+			};
+		}
+	}
 
 	update: async (id: string, data: BookUpdateDto): Promise<BookResponse> => {
 		const book = await prisma.book.findFirst({ where: { id } });

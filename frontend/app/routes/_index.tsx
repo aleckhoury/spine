@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
+import Client from "~/client";
 import { BookSearch } from "~/components/custom/BookSearch";
 import { LoginDialog } from "~/components/custom/LoginDialog";
 import { SignupDialog } from "~/components/custom/SignupDialog";
@@ -11,8 +13,11 @@ export async function loader() {
 	return { test: "test" };
 }
 
+const client = new Client("http://localhost:4000");
+
 export default function Welcome() {
-	const { isAuthenticated, logout } = useAuth();
+	const { isAuthenticated, logout, user } = useAuth();
+	const navigate = useNavigate();
 	const [items, setItems] = useState<{ id: string; content: string }[]>([
 		{ id: "1", content: "Create list" },
 		{ id: "2", content: "View lists" },
@@ -25,6 +30,17 @@ export default function Welcome() {
 	// State to drive the dialog & ref to access dialog DOM element
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const modalRef = useRef<HTMLDialogElement>(null);
+
+	const createList = async () => {
+		if (!user) return;
+		const response = await client.lists.createList({
+			name: "New List 1",
+			userId: user.uid,
+		});
+		const list = response.result;
+		if (!list || Array.isArray(list)) return;
+		navigate(`/lists/${list.id}`);
+	};
 
 	useEffect(() => {
 		// If the dialog ref is ready, call the appropriate method based on state
@@ -62,6 +78,7 @@ export default function Welcome() {
 				</div>
 			</div>
 			<main className="flex items-center justify-center pt-16 pb-4 border-x-4 border-neutral">
+				{isAuthenticated && <Button onClick={createList}>Create List</Button>}
 				<div className="flex-1 flex flex-col items-center gap-16 min-h-0">
 					<header className="flex flex-col items-center gap-9">
 						<BookSearch />

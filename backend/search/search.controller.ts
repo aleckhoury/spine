@@ -14,7 +14,7 @@ export const search = api<SearchParams, SearchResponse>(
 	{ method: "GET", expose: true, path: "/search" },
 	async (params: SearchParams) => {
 		try {
-			const maxResults = params.maxResults || 10; // Default to 10 results
+			const maxResults = params.maxResults || 5; // Default to 10 results
 			const startIndex = params.startIndex || 0;
 			if (!params.query) {
 				throw APIError.aborted("Search query is required");

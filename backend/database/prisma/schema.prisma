@@ -73,7 +73,7 @@ model ListItem {
   id         String   @id @default(uuid())
   listId     String
   userBookId String
-  position   Decimal  @default(1000000)
+  position   Int      @default(1000000)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   list       List     @relation(fields: [listId], references: [id])

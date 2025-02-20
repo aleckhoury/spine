@@ -3,14 +3,30 @@
 	"private": true,
 	"workspaces": [
 		"frontend",
-		"backend"
+		"backend",
+		"packages/shared-types"
 	],
 	"scripts": {
-		"dev": "npm run dev:backend & npm run dev:frontend",
+		"dev": "concurrently \"npm run dev:types\" \"npm run dev:frontend\" \"npm run dev:backend\"",
+		"dev:types": "npm run dev --workspace=@spine/types",
 		"dev:frontend": "npm run dev --workspace=frontend",
-		"dev:backend": "cd backend && encore run",
-		"build": "npm run build --workspaces",
+		"dev:backend": "npm run dev --workspace=backend",
+		"build": "npm run build:types && npm run build:frontend && npm run build:backend",
+		"build:types": "npm run build --workspace=@spine/types",
+		"build:frontend": "npm run build --workspace=frontend",
+		"build:backend": "npm run build --workspace=backend",
 		"test": "npm run test --workspaces",
-		"gen-client": "cd backend && encore gen client spine-3oii --lang=typescript --output=../frontend/app/client.ts"
+		"gen-client": "cd backend && encore gen client spine-3oii --lang=typescript --output=../frontend/app/client.ts",
+		"prisma:generate": "cd backend && npx prisma generate --schema=database/prisma/schema.prisma",
+		"prisma:migrate": "cd backend && npx prisma migrate dev --schema=database/prisma/schema.prisma",
+		"postinstall": "npm run build:types"
+	},
+	"devDependencies": {
+		"prisma": "^6.4.0",
+		"concurrently": "^8.0.0"
+	},
+	"dependencies": {
+		"@prisma/client": "^6.4.0",
+		"@spine/types": "*"
 	}
 }

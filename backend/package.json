@@ -17,8 +17,10 @@
 		"@prisma/client": "^6.3.1",
 		"@types/jsonwebtoken": "^9.0.8",
 		"bcrypt": "^5.1.1",
+		"decimal.js": "^10.5.0",
 		"encore.dev": "^1.46.4",
 		"jsonwebtoken": "^9.0.2",
-		"prisma": "^6.3.1"
+		"prisma": "^6.3.1",
+		"@spine/types": "*"
 	}
 }

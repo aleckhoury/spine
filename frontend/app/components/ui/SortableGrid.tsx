@@ -1,5 +1,3 @@
-"use client";
-
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import {
 	arrayMove,

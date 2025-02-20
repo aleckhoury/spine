@@ -1,4 +1,8 @@
+import { Decimal } from "decimal.js";
 import { api, APIError } from "encore.dev/api";
+import { UUID } from "node:crypto";
+import BookManagerService from "../book-manager/book-manager.service";
+import prisma from "../database/prismaClient";
 import {
 	ListCreateDto,
 	ListItemCreateDto,
@@ -19,6 +23,56 @@ export const createList = api(
 			return await ListService.create(params);
 		} catch (error) {
 			throw APIError.aborted(error?.toString() || "Error creating list");
+		}
+	}
+);
+
+export const addBookToListFromSearch = api(
+	{ method: "POST", expose: true, path: "/lists/:listId/add-from-search" },
+	async (params: {
+		listId: UUID;
+		isbn: string;
+		userId: string;
+	}): Promise<any> => {
+		try {
+			const book = await BookManagerService.getBook(params.isbn);
+			const userBook = await prisma.userBook.create({
+				data: {
+					bookId: book.id,
+					userId: params.userId,
+				},
+			});
+			const list = await prisma.list.findFirst({
+				where: {
+					id: params.listId,
+					userId: params.userId,
+				},
+				include: {
+					listItems: {
+						orderBy: {
+							position: "desc",
+						},
+						take: 1,
+					},
+				},
+			});
+
+			if (!list) {
+				throw APIError.notFound("List not found");
+			}
+
+			const lastPosition = list.listItems[0]?.position || new Decimal(0);
+
+			// Calculate new position - if there are no items, use 1000000, otherwise add 1000000 to last position
+			const defaultPosition = lastPosition.add(new Decimal(1000000));
+
+			return await ListService.createListItem({
+				listId: params.listId,
+				userBookId: userBook.id,
+				position: defaultPosition.toString(),
+			});
+		} catch (error) {
+			throw APIError.aborted(error?.toString() || "Error adding book to list");
 		}
 	}
 );

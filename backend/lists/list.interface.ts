@@ -58,7 +58,7 @@ export interface ListItemDto {
 export interface ListItemCreateDto {
 	userBookId: string;
 	// Optional position allows the database default to apply if omitted
-	position?: string;
+	position: string;
 }
 
 /**
