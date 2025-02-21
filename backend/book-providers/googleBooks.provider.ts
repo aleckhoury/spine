@@ -1,7 +1,11 @@
 // backend/book-providers/googleBooks.provider.ts
+import { SearchResponse } from "@spine/types";
 import { secret } from "encore.dev/config";
-import { Volume } from "../book-manager/google-books.types";
-import { SearchResponse } from "../search/search.service";
+import {
+	GoogleBooksResponse,
+	Volume,
+} from "../book-manager/google-books.types";
+import { TransformBookItem } from "../util";
 import { BookProvider } from "./book-provider.interface";
 
 // Google Books API base URL
@@ -18,7 +22,7 @@ export class GoogleBooksProviderService implements BookProvider {
 		}
 
 		const url = new URL(GOOGLE_BOOKS_API);
-		url.searchParams.append("q", `isbn:${isbn}`);
+		url.searchParams.append("q", `+isbn:${isbn}`);
 		url.searchParams.append("key", apiKey());
 
 		const response = await fetch(url, {
@@ -60,10 +64,8 @@ export class GoogleBooksProviderService implements BookProvider {
 
 		const data = (await response.json()) as GoogleBooksResponse;
 
-		console.log("DATA", JSON.stringify(data.items, null, 2));
-
 		return {
-			results: (data.items || []).map(transformBookItem),
+			results: (data.items || []).map(TransformBookItem),
 			totalResults: data.totalItems,
 			hasMore: startIndex + maxResults < data.totalItems,
 		};

@@ -1,6 +1,4 @@
-import { Decimal } from "decimal.js";
 import { api, APIError } from "encore.dev/api";
-import { UUID } from "node:crypto";
 import BookManagerService from "../book-manager/book-manager.service";
 import prisma from "../database/prismaClient";
 import {
@@ -30,12 +28,15 @@ export const createList = api(
 export const addBookToListFromSearch = api(
 	{ method: "POST", expose: true, path: "/lists/:listId/add-from-search" },
 	async (params: {
-		listId: UUID;
+		listId: string;
 		isbn: string;
 		userId: string;
-	}): Promise<any> => {
+	}): Promise<ListItemResponse> => {
 		try {
 			const book = await BookManagerService.getBook(params.isbn);
+			if (!book) {
+				throw APIError.notFound("Book not found");
+			}
 			const userBook = await prisma.userBook.create({
 				data: {
 					bookId: book.id,
@@ -61,15 +62,15 @@ export const addBookToListFromSearch = api(
 				throw APIError.notFound("List not found");
 			}
 
-			const lastPosition = list.listItems[0]?.position || new Decimal(0);
+			const lastPosition = list.listItems[0]?.position;
 
 			// Calculate new position - if there are no items, use 1000000, otherwise add 1000000 to last position
-			const defaultPosition = lastPosition.add(new Decimal(1000000));
+			const defaultPosition = lastPosition + 1000000;
 
 			return await ListService.createListItem({
 				listId: params.listId,
 				userBookId: userBook.id,
-				position: defaultPosition.toString(),
+				position: defaultPosition,
 			});
 		} catch (error) {
 			throw APIError.aborted(error?.toString() || "Error adding book to list");
@@ -94,24 +95,24 @@ export const getList = api(
 /**
  * Get all lists for a user with optional pagination
  */
-export const getLists = api(
-	{ method: "GET", expose: true, path: "/users/:userId/lists" },
-	async ({
-		userId,
-		page,
-		limit,
-	}: {
-		userId: string;
-		page?: number;
-		limit?: number;
-	}): Promise<ListResponse> => {
-		try {
-			return await ListService.find(userId, page, limit);
-		} catch (error) {
-			throw APIError.aborted(error?.toString() || "Error getting lists");
-		}
-	}
-);
+// export const getLists = api(
+// 	{ method: "GET", expose: true, path: "/users/:userId/lists" },
+// 	async ({
+// 		userId,
+// 		page,
+// 		limit,
+// 	}: {
+// 		userId: string;
+// 		page?: number;
+// 		limit?: number;
+// 	}): Promise<ListResponse> => {
+// 		try {
+// 			return await ListService.find(userId, page, limit);
+// 		} catch (error) {
+// 			throw APIError.aborted(error?.toString() || "Error getting lists");
+// 		}
+// 	}
+// );
 
 /**
  * Update list information

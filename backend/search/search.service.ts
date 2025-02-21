@@ -1,15 +1,7 @@
-const OPEN_LIBRARY_API = "https://openlibrary.org/search.json";
+import { SearchResponse } from "@spine/types";
+import { TransformBookItem } from "../util";
 
-// Helper to transform Google Books item to SearchResult
-function transformBookItem(item: BookItem): SearchResult {
-	return {
-		id: item.id,
-		title: item.volumeInfo.title,
-		authors: item.volumeInfo.authors || [],
-		thumbnail: item.volumeInfo.imageLinks?.thumbnail || null,
-		publishedDate: item.volumeInfo.publishedDate || null,
-	};
-}
+const OPEN_LIBRARY_API = "https://openlibrary.org/search.json";
 
 const SearchService = {
 	searchOpenLibrary: async (
@@ -34,10 +26,8 @@ const SearchService = {
 
 		const data = await response.json();
 
-		console.log("DATA", data);
-
 		return {
-			results: (data.docs || []).map(transformBookItem),
+			results: (data.docs || []).map(TransformBookItem),
 			totalResults: data.numFound,
 			hasMore: startIndex + maxResults < data.numFound,
 		};

@@ -2,7 +2,6 @@ import prisma from "../database/prismaClient";
 import { getOffset, paginatedData } from "../utils";
 import {
 	ListCreateDto,
-	ListDto,
 	ListItemCreateDto,
 	ListItemDto,
 	ListItemResponse,
@@ -43,51 +42,51 @@ const ListService = {
 		};
 	},
 
-	find: async (
-		userId: string,
-		page?: number,
-		limit?: number
-	): Promise<ListResponse> => {
-		let lists: ListDto[] = [];
-		let pagination: any = undefined;
-		if (page && limit) {
-			const offset = getOffset(page, limit);
-			const count = await prisma.list.count({ where: { userId } });
-			lists = (
-				await prisma.list.findMany({
-					where: { userId },
-					take: limit,
-					skip: offset,
-					include: { listItems: true },
-				})
-			).map((list) => ({
-				...list,
-				listItems: list.listItems.map((item) => ({
-					...item,
-					position: item.position.toString(),
-				})),
-			}));
-			pagination = paginatedData({ size: limit, page, count });
-		} else {
-			lists = (
-				await prisma.list.findMany({
-					where: { userId },
-					include: { listItems: true },
-				})
-			).map((list) => ({
-				...list,
-				listItems: list.listItems.map((item) => ({
-					...item,
-					position: item.position.toString(),
-				})),
-			}));
-		}
-		return {
-			success: true,
-			result: lists,
-			pagination,
-		};
-	},
+	// find: async (
+	// 	userId: string,
+	// 	page?: number,
+	// 	limit?: number
+	// ): Promise<ListResponse> => {
+	// 	let lists: ListDto[] = [];
+	// 	let pagination: any = undefined;
+	// 	if (page && limit) {
+	// 		const offset = getOffset(page, limit);
+	// 		const count = await prisma.list.count({ where: { userId } });
+	// 		lists = (
+	// 			await prisma.list.findMany({
+	// 				where: { userId },
+	// 				take: limit,
+	// 				skip: offset,
+	// 				include: { listItems: true },
+	// 			})
+	// 		).map((list) => ({
+	// 			...list,
+	// 			listItems: list.listItems.map((item) => ({
+	// 				...item,
+	// 				position: item.position,
+	// 			})),
+	// 		}));
+	// 		pagination = paginatedData({ size: limit, page, count });
+	// 	} else {
+	// 		lists = (
+	// 			await prisma.list.findMany({
+	// 				where: { userId },
+	// 				include: { listItems: true },
+	// 			})
+	// 		).map((list) => ({
+	// 			...list,
+	// 			listItems: list.listItems.map((item) => ({
+	// 				...item,
+	// 				position: item.position,
+	// 			})),
+	// 		}));
+	// 	}
+	// 	return {
+	// 		success: true,
+	// 		result: lists,
+	// 		pagination,
+	// 	};
+	// },
 
 	findOne: async (id: string): Promise<ListResponse> => {
 		const list = await prisma.list.findFirst({
@@ -106,7 +105,7 @@ const ListService = {
 				...list,
 				listItems: list.listItems.map((item) => ({
 					...item,
-					position: item.position.toString(),
+					position: item.position,
 				})),
 			},
 		};
@@ -133,7 +132,7 @@ const ListService = {
 		const listItem = await prisma.listItem.create({ data });
 		return {
 			success: true,
-			result: { ...listItem, position: listItem.position.toString() },
+			result: { ...listItem, position: listItem.position },
 		};
 	},
 
@@ -154,7 +153,7 @@ const ListService = {
 		});
 		return {
 			success: true,
-			result: { ...updated, position: updated.position.toString() },
+			result: { ...updated, position: updated.position },
 		};
 	},
 
@@ -176,7 +175,7 @@ const ListService = {
 			});
 			listItems = items.map((item) => ({
 				...item,
-				position: item.position.toString(),
+				position: item.position,
 			}));
 			pagination = paginatedData({ size: limit, page, count });
 		} else {
@@ -186,7 +185,7 @@ const ListService = {
 			});
 			listItems = items.map((item) => ({
 				...item,
-				position: item.position.toString(),
+				position: item.position,
 			}));
 		}
 		return {
@@ -206,7 +205,7 @@ const ListService = {
 		}
 		return {
 			success: true,
-			result: { ...listItem, position: listItem.position.toString() },
+			result: { ...listItem, position: listItem.position },
 		};
 	},
 

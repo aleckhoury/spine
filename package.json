@@ -16,9 +16,10 @@
 		"build:frontend": "npm run build --workspace=frontend",
 		"build:backend": "npm run build --workspace=backend",
 		"test": "npm run test --workspaces",
-		"gen-client": "cd backend && encore gen client spine-3oii --lang=typescript --output=../frontend/app/client.ts",
+		"gen-client": "npm run build:types && cd backend && encore gen client spine-3oii --lang=typescript --output=../frontend/app/client.ts",
 		"prisma:generate": "cd backend && npx prisma generate --schema=database/prisma/schema.prisma",
 		"prisma:migrate": "cd backend && npx prisma migrate dev --schema=database/prisma/schema.prisma",
+		"prisma:studio": "cd backend && npx prisma studio --schema=database/prisma/schema.prisma",
 		"postinstall": "npm run build:types"
 	},
 	"devDependencies": {

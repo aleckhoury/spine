@@ -199,25 +199,36 @@ export namespace auth {
 export namespace books {
     export interface BookCreateDto {
         title: string
-        isbn?: string
-        datePublished?: string
-        pages?: number
-        overview?: string
-        image?: string
-        synopsis?: string
+        isbn: string
+        subtitle?: string
         authors: string[]
+        publishedDate?: string
+        pages?: number
+        description?: string
+        image?: { [key: string]: string }
+        mainCategory?: string
+        categories: string[]
     }
 
     export interface BookDto {
         id: string
+        isbn: string
         title: string
-        isbn?: string | null
-        datePublished?: string | null
-        pages?: number | null
-        overview?: string | null
-        image?: string | null
-        synopsis?: string | null
+        subtitle?: string | null
         authors: string[]
+        publishedDate?: string | null
+        pages?: number | null
+        description?: string | null
+        image?: {
+            smallThumbnail?: string
+            thumbnail?: string
+            small?: string
+            medium?: string
+            large?: string
+            extraLarge?: string
+        }
+        mainCategory?: string | null
+        categories: string[]
         createdAt: string
         updatedAt: string
     }
@@ -236,7 +247,7 @@ export namespace books {
         /**
          * Book data, can be a single book or an array of books
          */
-        result?: BookDto | BookDto[]
+        result?: BookDto
 
         /**
          * Optional pagination metadata
@@ -247,12 +258,14 @@ export namespace books {
     export interface BookUpdateDto {
         title?: string
         isbn?: string
-        datePublished?: string
-        pages?: number
-        overview?: string
-        image?: string
-        synopsis?: string
+        subtitle?: string
         authors?: string[]
+        publishedDate?: string
+        pages?: number
+        description?: string
+        image?: { [key: string]: string }
+        mainCategory?: string
+        categories?: string[]
     }
 
     export type ReadingStatus = "NOT_STARTED" | "READING" | "COMPLETED" | "ABANDONED"
@@ -460,7 +473,7 @@ export namespace lists {
          * Note: Prisma returns Decimal for this field.
          * Representing it as a string ensures clients handle large or precise values.
          */
-        position: string
+        position: number
 
         createdAt: string
         updatedAt: string
@@ -489,7 +502,7 @@ export namespace lists {
     }
 
     export interface ListItemUpdateDto {
-        position?: string
+        position?: number
     }
 
     export interface ListResponse {
@@ -506,7 +519,7 @@ export namespace lists {
         /**
          * List data, can be a single list or an array of lists
          */
-        result?: ListDto | ListDto[]
+        result?: ListDto
 
         /**
          * Optional pagination metadata
@@ -523,6 +536,15 @@ export namespace lists {
 
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
+        }
+
+        public async addBookToListFromSearch(listId: string, params: {
+    isbn: string
+    userId: string
+}): Promise<ListItemResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI("POST", `/lists/${encodeURIComponent(listId)}/add-from-search`, JSON.stringify(params))
+            return await resp.json() as ListItemResponse
         }
 
         /**
@@ -542,7 +564,7 @@ export namespace lists {
     /**
      * Optional position allows the database default to apply if omitted
      */
-    position?: string
+    position: number
 }): Promise<ListItemResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI("POST", `/lists/${encodeURIComponent(listId)}/items`, JSON.stringify(params))
@@ -604,24 +626,6 @@ export namespace lists {
         }
 
         /**
-         * Get all lists for a user with optional pagination
-         */
-        public async getLists(userId: string, params: {
-    page?: number
-    limit?: number
-}): Promise<ListResponse> {
-            // Convert our params into the objects we need for the request
-            const query = makeRecord<string, string | string[]>({
-                limit: params.limit === undefined ? undefined : String(params.limit),
-                page:  params.page === undefined ? undefined : String(params.page),
-            })
-
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI("GET", `/users/${encodeURIComponent(userId)}/lists`, undefined, {query})
-            return await resp.json() as ListResponse
-        }
-
-        /**
          * Update list information
          */
         public async updateList(id: string, params: {
@@ -652,20 +656,6 @@ export namespace search {
         startIndex?: number
     }
 
-    export interface SearchResponse {
-        results: SearchResult[]
-        totalResults: number
-        hasMore: boolean
-    }
-
-    export interface SearchResult {
-        id: string
-        title: string
-        authors: string[]
-        thumbnail: string | null
-        publishedDate: string | null
-    }
-
     export class ServiceClient {
         private baseClient: BaseClient
 
@@ -676,7 +666,7 @@ export namespace search {
         /**
          * Search Google Books API
          */
-        public async search(params: SearchParams): Promise<SearchResponse> {
+        public async search(params: SearchParams): Promise<src.SearchResponse> {
             // Convert our params into the objects we need for the request
             const query = makeRecord<string, string | string[]>({
                 maxResults: params.maxResults === undefined ? undefined : String(params.maxResults),
@@ -686,7 +676,7 @@ export namespace search {
 
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI("GET", `/search`, undefined, {query})
-            return await resp.json() as SearchResponse
+            return await resp.json() as src.SearchResponse
         }
     }
 }
@@ -857,6 +847,23 @@ export namespace backend {
          * The result of the request (number or string)
          */
         result?: string | number
+    }
+}
+
+export namespace src {
+    export interface SearchResponse {
+        results: SearchResult[]
+        totalResults: number
+        hasMore: boolean
+    }
+
+    export interface SearchResult {
+        id: string
+        isbn: string | null
+        title: string
+        authors: string[]
+        thumbnail: string | null
+        publishedDate: string | null
     }
 }
 

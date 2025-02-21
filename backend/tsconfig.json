@@ -4,7 +4,8 @@
 		"target": "ES2022",
 		"types": ["node"],
 		"paths": {
-			"~encore/*": ["./encore.gen/*"]
+			"~encore/*": ["./encore.gen/*"],
+			"@spine/types": ["../packages/shared-types/src"]
 		},
 		/* Workspace Settings */
 		"composite": true,
@@ -36,7 +37,8 @@
 		"**/*.ts",
 		"**/*.tsx",
 		".next/types/**/*.ts",
-		"../frontend/app/client.ts"
+		"../frontend/app/client.ts",
+		"../packages/shared-types/src/**/*"
 	],
 	"exclude": ["node_modules"]
 }

@@ -6,6 +6,7 @@
 	"license": "MPL-2.0",
 	"type": "module",
 	"scripts": {
+		"dev": "encore run",
 		"postinstall": "npx prisma generate --schema=database/prisma/schema.prisma"
 	},
 	"devDependencies": {

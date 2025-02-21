@@ -3,15 +3,18 @@ import Client from "~/client";
 import { BookSearch } from "~/components/custom/BookSearch";
 
 export async function loader({ params }: LoaderFunctionArgs) {
-	const client = new Client("http://localhost:4000");
-	const list = await client.lists.getList(params.id);
+	const client = new Client(process.env.API_URL!);
+	const response = await client.lists.getList(params.id!);
+	const list = response.result;
 	return { list };
 }
 
-const client = new Client("http://localhost:4000");
-
 export default function ListPage() {
-	const { list } = useLoaderData<typeof loader>();
+	const response = useLoaderData<typeof loader>();
+	const list = response.list;
+	if (!list) {
+		return <div>List not found</div>;
+	}
 
 	const addBook = (book: any) => {};
 

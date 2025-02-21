@@ -1,5 +1,6 @@
 import { type SearchResult } from "@spine/types";
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { useDebounce } from "use-debounce";
 import Client from "~/client";
 import { Input } from "~/components/ui/input";
@@ -18,6 +19,7 @@ export function BookSearch({
 	const [results, setResults] = useState<SearchResult[]>([]);
 	const [debouncedValue] = useDebounce(searchTerm, 500);
 	const client = new Client("http://localhost:4000");
+	const navigate = useNavigate();
 
 	const searchBooks = useCallback(
 		async (query: string) => {
@@ -49,17 +51,6 @@ export function BookSearch({
 		searchBooks(debouncedValue);
 	}, [debouncedValue, searchBooks]);
 
-	useEffect(() => {
-		const down = (e: KeyboardEvent) => {
-			if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-				e.preventDefault();
-				setOpen((open) => !open);
-			}
-		};
-		document.addEventListener("keydown", down);
-		return () => document.removeEventListener("keydown", down);
-	}, []);
-
 	return (
 		<div className="relative w-full">
 			<Input
@@ -86,7 +77,7 @@ export function BookSearch({
 											key={result.id}
 											className="flex gap-4 p-2 rounded-sm hover:bg-accent cursor-pointer"
 											onClick={() => {
-												setSearchTerm(result.title);
+												navigate(`/books/${result.isbn}`);
 											}}
 										>
 											<div>

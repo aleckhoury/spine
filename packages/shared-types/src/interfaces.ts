@@ -11,8 +11,15 @@ export interface AuthContextType {
 
 export interface SearchResult {
 	id: string;
+	isbn: string | null;
 	title: string;
 	authors: string[];
 	thumbnail: string | null;
 	publishedDate: string | null;
+}
+
+export interface SearchResponse {
+	results: SearchResult[];
+	totalResults: number;
+	hasMore: boolean;
 }

@@ -1,5 +1,5 @@
+import BookManagerService from "../book-manager/book-manager.service";
 import prisma from "../database/prismaClient";
-import SearchService from "../search/search.service";
 import { getOffset, paginatedData } from "../utils";
 import {
 	BookCreateDto,
@@ -22,30 +22,29 @@ const BookService = {
 		const book = await prisma.book.create({ data });
 		return {
 			success: true,
-			result: book,
+			result: {
+				...book,
+				image: book.image as BookDto["image"],
+			},
 		};
 	},
 
 	findOneByISBN: async (isbn: string): Promise<any> => {
-		const internalBook = await prisma.book.findFirst({ where: { isbn } });
-
-		if (!internalBook) {
-			const externalBook = await SearchService.getGoogleBook(isbn);
-			const book = await prisma.book.create({
-				data: {
-					isbn: externalBook.id,
-					title: externalBook.volumeInfo.title,
-				},
-			});
-			return book;
-		}
+		const book = await BookManagerService.getBook(isbn);
 		if (!book) {
 			return {
 				success: false,
 				message: "Book not found",
 			};
 		}
-	}
+		return {
+			success: true,
+			result: {
+				...book,
+				image: book.image as BookDto["image"],
+			},
+		};
+	},
 
 	update: async (id: string, data: BookUpdateDto): Promise<BookResponse> => {
 		const book = await prisma.book.findFirst({ where: { id } });
@@ -61,7 +60,10 @@ const BookService = {
 		});
 		return {
 			success: true,
-			result: updated,
+			result: {
+				...updated,
+				image: updated.image as BookDto["image"],
+			},
 		};
 	},
 
@@ -78,7 +80,10 @@ const BookService = {
 		}
 		return {
 			success: true,
-			result: books,
+			result: books.map((book) => ({
+				...book,
+				image: book.image as BookDto["image"],
+			})),
 			pagination,
 		};
 	},
@@ -93,7 +98,10 @@ const BookService = {
 		}
 		return {
 			success: true,
-			result: book,
+			result: {
+				...book,
+				image: book.image as BookDto["image"],
+			},
 		};
 	},
 

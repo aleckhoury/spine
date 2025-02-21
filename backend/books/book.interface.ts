@@ -14,14 +14,23 @@ type ReadingStatus = "NOT_STARTED" | "READING" | "COMPLETED" | "ABANDONED";
  */
 export interface BookDto {
 	id: string;
+	isbn: string;
 	title: string;
-	isbn?: string | null;
-	datePublished?: Date | null;
-	pages?: number | null;
-	overview?: string | null;
-	image?: string | null;
-	synopsis?: string | null;
+	subtitle?: string | null;
 	authors: string[];
+	publishedDate?: Date | null;
+	pages?: number | null;
+	description?: string | null;
+	image?: {
+		smallThumbnail?: string;
+		thumbnail?: string;
+		small?: string;
+		medium?: string;
+		large?: string;
+		extraLarge?: string;
+	};
+	mainCategory?: string | null;
+	categories: string[];
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -32,13 +41,15 @@ export interface BookDto {
  */
 export interface BookCreateDto {
 	title: string;
-	isbn?: string;
-	datePublished?: Date;
-	pages?: number;
-	overview?: string;
-	image?: string;
-	synopsis?: string;
+	isbn: string;
+	subtitle?: string;
 	authors: string[];
+	publishedDate?: Date;
+	pages?: number;
+	description?: string;
+	image?: Record<string, string>;
+	mainCategory?: string;
+	categories: string[];
 }
 
 /**
@@ -49,12 +60,14 @@ export interface BookCreateDto {
 export interface BookUpdateDto {
 	title?: string;
 	isbn?: string;
-	datePublished?: Date;
-	pages?: number;
-	overview?: string;
-	image?: string;
-	synopsis?: string;
+	subtitle?: string;
 	authors?: string[];
+	publishedDate?: Date;
+	pages?: number;
+	description?: string;
+	image?: Record<string, string>;
+	mainCategory?: string;
+	categories?: string[];
 }
 
 /**
@@ -115,7 +128,7 @@ export interface BookResponse {
 	/** Error message if the request failed */
 	message?: string;
 	/** Book data, can be a single book or an array of books */
-	result?: BookDto | BookDto[];
+	result?: BookDto;
 	/** Optional pagination metadata */
 	pagination?: Paginated;
 }

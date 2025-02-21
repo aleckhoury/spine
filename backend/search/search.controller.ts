@@ -1,5 +1,6 @@
+import { SearchResponse } from "@spine/types";
 import { api, APIError } from "encore.dev/api";
-import SearchService, { SearchResponse } from "./search.service";
+import { BookProviders } from "../book-providers/book-provider.registry";
 
 interface SearchParams {
 	query: string;
@@ -20,7 +21,7 @@ export const search = api<SearchParams, SearchResponse>(
 				throw APIError.aborted("Search query is required");
 			}
 
-			return await SearchService.searchBooks(
+			return await BookProviders.google.searchBooks(
 				params.query,
 				maxResults,
 				startIndex

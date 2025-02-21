@@ -1,5 +1,5 @@
+import type { AuthUser } from "@spine/types";
 import { createContext } from "react";
-import type { AuthUser } from "~/types";
 
 interface AuthContextType {
 	user: AuthUser | null;

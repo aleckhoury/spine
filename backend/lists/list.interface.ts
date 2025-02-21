@@ -45,7 +45,7 @@ export interface ListItemDto {
 	userBookId: string;
 	// Note: Prisma returns Decimal for this field.
 	// Representing it as a string ensures clients handle large or precise values.
-	position: string;
+	position: number;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -58,7 +58,7 @@ export interface ListItemDto {
 export interface ListItemCreateDto {
 	userBookId: string;
 	// Optional position allows the database default to apply if omitted
-	position: string;
+	position: number;
 }
 
 /**
@@ -67,7 +67,7 @@ export interface ListItemCreateDto {
  * The id field is required to identify the list item to update.
  */
 export interface ListItemUpdateDto {
-	position?: string;
+	position?: number;
 }
 
 /**
@@ -79,7 +79,7 @@ export interface ListResponse {
 	/** Error message if the request failed */
 	message?: string;
 	/** List data, can be a single list or an array of lists */
-	result?: ListDto | ListDto[];
+	result?: ListDto;
 	/** Optional pagination metadata */
 	pagination?: Paginated;
 }

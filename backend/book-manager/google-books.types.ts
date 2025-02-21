@@ -199,3 +199,9 @@ export interface Volume {
 	accessInfo: VolumeAccessInfo;
 	searchInfo?: VolumeSearchInfo;
 }
+
+export interface GoogleBooksResponse {
+	items: Volume[];
+	totalItems: number;
+	kind: string;
+}

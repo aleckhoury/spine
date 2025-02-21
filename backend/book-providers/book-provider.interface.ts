@@ -1,4 +1,5 @@
 // backend/book-providers/book-provider.interface.ts
+import { SearchResponse } from "@spine/types";
 import { Volume } from "../book-manager/google-books.types";
 
 export interface BookProvider {

@@ -30,7 +30,7 @@ export const getBook = api(
 	{ method: "GET", expose: true, path: "/books/:id" },
 	async ({ id }: { id: string }): Promise<BookResponse> => {
 		try {
-			return await BookService.findOne(id);
+			return await BookService.findOneByISBN(id);
 		} catch (error) {
 			throw APIError.aborted(error?.toString() || "Error getting book");
 		}
